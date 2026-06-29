@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>CarteiraInvestimentos</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Adapters\Driving\Controllers\" />
+      <Folder Include="Adapters\Infrastructure\Database\" />
+      <Folder Include="Adapters\Infrastructure\External\" />
+      <Folder Include="Domain\Services\" />
+      <Folder Include="DTOs\" />
+      <Folder Include="Ports\" />
+    </ItemGroup>
+
+</Project>

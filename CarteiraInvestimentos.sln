@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarteiraInvestimentos", "CarteiraInvestimentos\CarteiraInvestimentos.csproj", "{BDBCBA98-DA4D-436B-9C88-F176997A220C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarteiraInvestimentosAPI", "CarteiraInvestimentosAPI\CarteiraInvestimentosAPI.csproj", "{BDBCBA98-DA4D-436B-9C88-F176997A220C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
