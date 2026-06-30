@@ -5,5 +5,5 @@ public record WalletDto(
     decimal TotalCurrencyAmount, // patrimônio
     decimal TotalProfitOrLoss,
     DateTime CalculationDate,
-    List<AssetSumarryDto> Assets
+    List<AssetSummaryDto> Assets
     );

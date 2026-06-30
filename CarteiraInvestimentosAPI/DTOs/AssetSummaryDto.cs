@@ -3,7 +3,7 @@ namespace CarteiraInvestimentos.DTOs;
 /*
  * É triste ser cabaço no inglês
  */
-public record AssetSumaryDto(
+public record AssetSummaryDto(
     string Ticker,
     int CurrentQuantity, // PrecoMedioCompra
     decimal CurrentMarketPrice, // PrecoAtualMercado
