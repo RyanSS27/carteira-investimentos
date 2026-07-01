@@ -1,11 +1,19 @@
+using CarteiraInvestimentos.Adapters.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Ryan do amanhã, aqui você precisa criar uma var connectionString para pegar aquela string de settings
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Injeção de dependências
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddControllers();
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
