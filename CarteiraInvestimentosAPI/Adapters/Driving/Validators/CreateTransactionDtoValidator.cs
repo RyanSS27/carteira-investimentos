@@ -8,16 +8,16 @@ public class CreateTransactionDtoValidator : AbstractValidator<CreateTransaction
     public CreateTransactionDtoValidator()
     {
         RuleFor(x => x.Ticker)
-            .NotEmpty().WithMessage("Ticker is required.")
-            .Matches(@"^[A-Z0-9]{5,6}$").WithMessage("Invalid Ticker format. Must be 5 to 6 alphanumeric characters (e.g., PETR4).");
+            .NotEmpty().WithMessage("Valor para \"Ticker\" é necessário.")
+            .Matches(@"^[A-Z0-9]{5,6}$").WithMessage("Ticker no formato inválido. Dever ter entre 5 e 6 caracteres alfanuméricos (ex: PETR4).");
 
         RuleFor(x => x.Quantity)
-            .GreaterThan(0).WithMessage("Quantity must be greater than zero.");
+            .GreaterThan(0).WithMessage("\"Quantity\" precisa ser maior que 0.");
 
         RuleFor(x => x.UnitPrice)
-            .GreaterThan(0).WithMessage("Unit price must be greater than zero.");
+            .GreaterThan(0).WithMessage("\"Unit price\" deve ser superior a 0.");
 
         RuleFor(x => x.TransactionType)
-            .IsInEnum().WithMessage("Invalid transaction type. Must be BUY or SELL.");
+            .IsInEnum().WithMessage("\"TransactionType\" inválido. Valores esperados: BUY ou SELL.");
     }
 }

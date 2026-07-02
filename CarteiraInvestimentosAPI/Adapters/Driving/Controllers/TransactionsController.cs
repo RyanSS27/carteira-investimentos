@@ -7,9 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace CarteiraInvestimentos.Adapters.Driving.Controllers;
 
 [ApiController]
-[Route("api/transactions")] // Define a rota base da API em inglês 
+[Route("api/transactions")]
 public class TransactionsController : ControllerBase
 {
+    // "readonly" faz com que só possa ser atribuído no contrutor e não possa ser alterado
     private readonly IPortfolioService _portfolioService;
     private readonly IValidator<CreateTransactionDto> _validator;
 
@@ -19,20 +20,21 @@ public class TransactionsController : ControllerBase
         _validator = validator;
     }
 
-    [HttpPost] // Endpoint para registrar uma movimentação [cite: 44]
+    [HttpPost] // Endpoint das transactions
     public async Task<IActionResult> Create([FromBody] CreateTransactionDto dto)
     {
-        // 1. Executa a validação isolada de formato
         var validationResult = await _validator.ValidateAsync(dto);
 
+        // Verifica e retorna os erros que ocorreram em forma de mensagens
         if (!validationResult.IsValid)
         {
-            // Retorna um espelho limpo contendo as propriedades e mensagens de erro
-            var errors = validationResult.Errors.Select(e => new { property = e.PropertyName, message = e.ErrorMessage });
+            var errors = validationResult.Errors.Select(
+                e => new { property = e.PropertyName, message = e.ErrorMessage }
+                );
             return BadRequest(errors);
         }
 
-        // 2. Transforma o DTO limpo na Entidade de Negócio (Tratando o texto)
+        // Instancia a transaction
         var transaction = new Transaction
         {
             Ticker = dto.Ticker.ToUpper().Trim(),
@@ -40,14 +42,13 @@ public class TransactionsController : ControllerBase
             UnitPrice = dto.UnitPrice,
             TransactionType = dto.TransactionType
         };
-
-        // 3. Envia para o serviço core processar e salvar no PostgreSQL
+        
         await _portfolioService.AddTransactionAsync(transaction);
 
-        // 4. Retorna o contrato exato estipulado na especificação técnica [cite: 52]
+        // Retorna um positivo 
         return StatusCode(201, new 
         { 
-            message = $"Transaction of {transaction.TransactionType} for {transaction.Ticker} recorded successfully!",
+            message = $"Transação de {transaction.TransactionType} de Ticker {transaction.Ticker} salva com sucesso!",
             transactionId = transaction.TransactionId,
             date = transaction.TransactionDate
         });

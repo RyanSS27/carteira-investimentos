@@ -11,8 +11,7 @@ namespace CarteiraInvestimentos.Domain.Services;
 public class PortfolioService : IPortfolioService
 {
     private readonly ApplicationDbContext _context;
-
-    // 1. Injeção de Dependência pelo Construtor (O .NET resolve sozinho)
+    
     public PortfolioService(ApplicationDbContext context)
     {
         _context = context;
@@ -21,35 +20,35 @@ public class PortfolioService : IPortfolioService
     // Usamos o padrão async/await para operações de banco de dados no .NET
     public async Task AddTransactionAsync(Transaction transaction)
     {
-        // Correção 1: Acessando a propriedade do Enum diretamente
+        
         if (transaction.TransactionType == TransactionType.BUY)
         {
-            // Correção 2: Adiciona na tabela gerenciada pelo DbContext
             _context.Transactions.Add(transaction);
             
-            // Correção 3: Salva fisicamente no PostgreSQL
             await _context.SaveChangesAsync();
             return; 
         }
         
-        // --- SE FOR UMA VENDA ---
         
-        // Usamos o LINQ (Sintaxe expressiva do .NET) para somar as compras e vendas direto no banco
-        int totalBought = await _context.Transactions
+        /*
+            Somar as compras e vendas direto no banco
+            Pesquisar melhor sobre o LINQ que é traduzido em queries no banco
+        */
+        int quantityTotalBuy = await _context.Transactions
             .Where(t => t.Ticker == transaction.Ticker && t.TransactionType == TransactionType.BUY)
             .SumAsync(t => t.Quantity);
 
-        int totalSold = await _context.Transactions
+        int quantityTotalSell = await _context.Transactions
             .Where(t => t.Ticker == transaction.Ticker && t.TransactionType == TransactionType.SELL)
             .SumAsync(t => t.Quantity);
 
-        int currentBalance = totalBought - totalSold;
+        int currentBalance = quantityTotalBuy - quantityTotalSell; // Total de ações restantes ainda vigentes
 
-        // Validação de Negócio: Impede que o usuário fique com ações negativas 
+        
         if (transaction.Quantity > currentBalance)
         {
             throw new InvalidOperationException(
-                $"Insufficient stock balance to sell {transaction.Ticker}. You currently have {currentBalance} shares.");
+                $"Não há ações suficientes de {transaction.Ticker} para a venda. Há {currentBalance} ações disponíveis.");
         }
 
         // Se passou na validação, permite o registro da venda
