@@ -16,8 +16,6 @@
     <ItemGroup>
       <Folder Include="Adapters\Driving\Controllers\" />
       <Folder Include="Adapters\Infrastructure\External\" />
-      <Folder Include="Domain\Services\" />
-      <Folder Include="Ports\" />
     </ItemGroup>
 
 </Project>

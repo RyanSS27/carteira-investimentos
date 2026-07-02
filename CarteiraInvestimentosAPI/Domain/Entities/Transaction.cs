@@ -16,15 +16,11 @@ public class Transaction
     [Required]
     [MaxLength(10)]
     [Column("transaction_date")]
-    public String Ticket { get; set; }
+    public String Ticker { get; set; }
     
     [Required]
     [Column("quantity")]
     public int Quantity { get; set; }
-    
-    [Required]
-    [Column("unit_price")]
-    public decimal UnitPrice { get; set; }
     
     [Required]
     [Precision(18, 2)] // Número máximo de 18 casas (contando com os 2 pós vírgula)
