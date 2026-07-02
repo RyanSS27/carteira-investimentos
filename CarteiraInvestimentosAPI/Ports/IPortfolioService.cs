@@ -3,7 +3,7 @@ using CarteiraInvestimentos.DTOs;
 
 namespace CarteiraInvestimentos.Ports;
 
-public interface IPortFolioService
+public interface IPortfolioService
 { 
     public Task AddTransactionAsync(Transaction transaction);
     public PortifolioDto GetPortifolioSummary();

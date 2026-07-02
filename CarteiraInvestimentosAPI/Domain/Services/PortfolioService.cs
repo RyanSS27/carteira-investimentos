@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CarteiraInvestimentos.Domain.Services;
 
-public class PortfolioService : IPortFolioService
+public class PortfolioService : IPortfolioService
 {
     private readonly ApplicationDbContext _context;
 
@@ -45,7 +45,7 @@ public class PortfolioService : IPortFolioService
 
         int currentBalance = totalBought - totalSold;
 
-        [cite_start]// Validação de Negócio: Impede que o usuário fique com ações negativas 
+        // Validação de Negócio: Impede que o usuário fique com ações negativas 
         if (transaction.Quantity > currentBalance)
         {
             throw new InvalidOperationException(

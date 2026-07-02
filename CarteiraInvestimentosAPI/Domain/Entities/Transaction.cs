@@ -25,7 +25,7 @@ public class Transaction
     [Required]
     [Precision(18, 2)] // Número máximo de 18 casas (contando com os 2 pós vírgula)
     [Column("unit_amount")]
-    public decimal UnitAmount { get; set; }
+    public decimal UnitPrice { get; set; }
     
     [Required]
     [Column("transaction_type")]
