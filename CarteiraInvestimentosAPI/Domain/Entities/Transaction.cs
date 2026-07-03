@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace CarteiraInvestimentos.Domain.Entities;
 
-[Table("Transaction")]
+[Table("transaction")]
 public class Transaction
 {
     [Key]
@@ -15,7 +15,7 @@ public class Transaction
     
     [Required]
     [MaxLength(10)]
-    [Column("transaction_date")]
+    [Column("ticker")]
     public String Ticker { get; set; }
     
     [Required]
@@ -24,7 +24,7 @@ public class Transaction
     
     [Required]
     [Precision(18, 2)] // Número máximo de 18 casas (contando com os 2 pós vírgula)
-    [Column("unit_amount")]
+    [Column("unit_price")]
     public decimal UnitPrice { get; set; }
     
     [Required]
