@@ -60,9 +60,18 @@ public class PortfolioService : IPortfolioService
 
     public async Task<PortfolioSummaryDto> GetPortfolioSummaryAsync()
     {
-        // Devo otimizar essa busca para não carregar tantos dados na RAM e agrupar tudo depois
-        // Acredito que dê para fazer uma query otimizada
-        var allTransactions = await _context.Transactions.ToListAsync();
+        var allTransactions = await _context.Transactions
+            .AsNoTracking() // Remove o cache de rastreamento do EF, liberando memória RAM
+            .OrderBy(t => t.Ticker)
+            .ThenBy(t => t.TransactionDate) 
+            .Select(t => new 
+            {
+                t.Ticker,
+                t.Quantity,
+                t.UnitPrice,
+                t.TransactionType
+            })
+            .ToListAsync();
         
         var groups = allTransactions.GroupBy(t => t.Ticker);
         var assetsList = new List<AssetSummaryDto>();
@@ -70,25 +79,47 @@ public class PortfolioService : IPortfolioService
         foreach (var group in groups)
         {
             string ticker = group.Key;
-
-            // Cálculos básicos de quantidade líquida
-            int totalBought = group.Where(t => t.TransactionType == TransactionType.BUY).Sum(t => t.Quantity);
-            int totalSold = group.Where(t => t.TransactionType == TransactionType.SELL).Sum(t => t.Quantity);
-            int currentQuantity = totalBought - totalSold;
+            
+            /*
+                Ajuste móvel cronológico do preço médio de aquisição: o cálculo atualiza a média de aquisição
+                apenas quando você compra novas ações.
+                
+                Assim, a venda de ações não influência o valor médio de quanto você pagou por elas (isso vinha
+                ocorrendo antes)
+            */
+            
+            int currentQuantity = 0;
+            decimal totalInvestedValue = 0;
+            decimal averageAcquisitionPrice = 0;
+            
+            foreach (var t in group)
+            {
+                if (t.TransactionType == TransactionType.BUY)
+                {
+                    // Nova compra: Incrementa estoque, soma novo capital e recalcula o preço médio
+                    totalInvestedValue += (t.Quantity * t.UnitPrice);
+                    currentQuantity += t.Quantity;
+                    averageAcquisitionPrice = currentQuantity > 0 ? totalInvestedValue / currentQuantity : 0;
+                }
+                else if (t.TransactionType == TransactionType.SELL)
+                {
+                    // Venda: Reduz estoque e abate o valor investido proporcionalmente ao preço médio atual
+                    currentQuantity -= t.Quantity;
+                    totalInvestedValue = currentQuantity * averageAcquisitionPrice;
+                }
+            }
             
             if (currentQuantity <= 0) continue;
 
-            /*
-                Cálcula do preço médio ponderado: custo para comprar todas as ações / qtde comprada
-                Para criar uma estimativa de quanto vale cada ação
-            */ 
-            decimal totalBoughtCost = group.Where(t => t.TransactionType == TransactionType.BUY).Sum(t => t.Quantity * t.UnitPrice);
-            decimal averagePrice = totalBought > 0 ? totalBoughtCost / totalBought : 0;
-
-            decimal currentPrice = averagePrice; // Valor inicial padrão (Fallback)
+            decimal currentPrice = averageAcquisitionPrice;
             bool isPriceUpToDate = false;
 
-            // Consulta à API Externa (Um por Um) com Rastreamento de Erro no Console
+            /*
+                O ideal seria fazer uma consulta única com vários Tickers, pois a API da Brapi consegue retornar
+                um array com todas as informações. 
+                
+                Porém, esta opção não está disponível gratuitamente e por isso tenho de conferir Ticker por Ticker.
+             */
             try
             {
                 // Faz a chamada individual para o ativo corrente
@@ -102,30 +133,28 @@ public class PortfolioService : IPortfolioService
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"[API WARNING] Expected valid price for {ticker}, but received: '{apiPrice}'. Applying fallback.");
+                    Console.WriteLine($"[API WARNING] Não foi encontrado um correspondente ao ticker {ticker}, recebemos: '{apiPrice}'. O valor de custo será aplicado.");
                     Console.ResetColor();
                 }
             }
             catch (Exception ex)
             {
-                // Imprime o erro crônicamente no console do servidor para você debugar
+                // Imprime os erros para facilitar o debug
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[API ERROR] Failed to fetch or parse price for ticker {ticker}. Destination Platform limits or structure mismatch.");
-                Console.WriteLine($"Exception Details: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                Console.WriteLine($"[API ERROR] Falha ao buscar pelo {ticker}. Limites da plataforma de destino ou incompatibilidades com a estrutura.");
+                Console.WriteLine($"Detalhes da Exception: {ex.Message}");
+                Console.WriteLine($"Rastreamento do erro: {ex.StackTrace}");
                 Console.ResetColor();
             }
-
-            // Cálculos financeiros do ativo individual
-            decimal totalInvestedValue = currentQuantity * averagePrice;
+            
             decimal totalCurrentValue = currentQuantity * currentPrice;
             decimal profitOrLoss = totalCurrentValue - totalInvestedValue;
-            decimal returnPercentage = averagePrice > 0 ? ((currentPrice / averagePrice) - 1) * 100 : 0;
+            decimal returnPercentage = averageAcquisitionPrice > 0 ? ((currentPrice / averageAcquisitionPrice) - 1) * 100 : 0;
 
             assetsList.Add(new AssetSummaryDto(
                 Ticker: ticker,
                 CurrentQuantity: currentQuantity,
-                AveragePrice: Math.Round(averagePrice, 2),
+                AveragePrice: Math.Round(averageAcquisitionPrice, 2),
                 CurrentMarketPrice: Math.Round(currentPrice, 2),
                 TotalInvestedValue: Math.Round(totalInvestedValue, 2),
                 TotalCurrentValue: Math.Round(totalCurrentValue, 2),
@@ -134,8 +163,7 @@ public class PortfolioService : IPortfolioService
                 IsPriceUpToDate: isPriceUpToDate
             ));
         }
-
-        // Consolidação das três caixas de Totais Gerais da Carteira
+        
         decimal totalValueUpToDate = assetsList.Where(a => a.IsPriceUpToDate).Sum(a => a.TotalCurrentValue);
         decimal totalValueEstimated = assetsList.Where(a => !a.IsPriceUpToDate).Sum(a => a.TotalCurrentValue);
         decimal totalValue = totalValueUpToDate + totalValueEstimated;
