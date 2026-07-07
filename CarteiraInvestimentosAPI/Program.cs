@@ -26,17 +26,32 @@ builder.Services.AddControllers()
     {
         // Permite que a API entenda e responda Enums como Texto (Strings) no JSON
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // Customiza a resposta de erros de validação/desserialização nativos do .NET
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0 && e.Key != "dto") 
+                .Select(e => new
+                {
+                    // Simplifica o caminho do campo (ex: "$.transactionType" vira apenas "transactionType")
+                    property = e.Key.Replace("$.", ""), 
+                    message = "O valor fornecido é invalido ou malformado."
+                });
+
+            return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(errors);
+        };
     });
-// Registra o BrapiService configurando a URL base e o Header de Autorização de forma global
+
+// Registra o BrapiService configurando a URL base de forma global (Sem necessidade de Token)
 builder.Services.AddHttpClient<IMercadoFinanceiroService, BrapiService>(client =>
 {
     client.BaseAddress = new Uri("https://brapi.dev/");
     client.Timeout = TimeSpan.FromSeconds(10);
-    
-    // Injeta o Token no formato 'Authorization: Bearer SEU_TOKEN' requerido pela produção da Brapi
-    client.DefaultRequestHeaders.Authorization = 
-        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "API_KEY");
 });
+
 // Registra o Serviço de Negócio como SCOPED (Uma instância por requisição HTTP)
 builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 // Varre o projeto buscando todas as classes que herdam de AbstractValidator e as registra automaticamente

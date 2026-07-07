@@ -20,7 +20,7 @@ public class BrapiService : IMercadoFinanceiroService
         {
             var response = await _httpClient.GetFromJsonAsync<BrapiResponse>(url);
 
-            // Acessa a primeira ação do array
+            // Tenta cessar a primeira ação do array
             var assetResult = response?.Results?.FirstOrDefault();
             
             // Navega até o objeto "data" interno e extrai o preço de mercado
@@ -34,7 +34,7 @@ public class BrapiService : IMercadoFinanceiroService
         catch (Exception ex)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine($"[HTTP ERROR] Request failed for ticker: {ticker}");
+            Console.WriteLine($"[HTTP ERROR] Requisição falha para o ticker: {ticker}");
             
             try
             {
