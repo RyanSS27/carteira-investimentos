@@ -5,10 +5,12 @@ namespace CarteiraInvestimentos.DTOs;
  */
 public record AssetSummaryDto(
     string Ticker,
-    int CurrentQuantity, // PrecoMedioCompra
+    int CurrentQuantity, 
+    decimal AveragePrice, // PrecoMedioCompra
     decimal CurrentMarketPrice, // PrecoAtualMercado
     decimal TotalInvestedValue, // ValorTotalInvestido
     decimal TotalCurrentValue, // ValorTotal
     decimal ReturnPercentage, // RendimentoPercentual
-    decimal ProfitOrLoss // LucroNoAtivo
+    decimal ProfitOrLoss, // LucroNoAtivo
+    bool IsPriceUpToDate
     );
