@@ -6,5 +6,5 @@ namespace CarteiraInvestimentos.Ports;
 public interface IPortfolioService
 { 
     public Task AddTransactionAsync(Transaction transaction);
-    public PortifolioDto GetPortifolioSummary();
+    Task<PortfolioSummaryDto> GetPortfolioSummaryAsync();
 }
