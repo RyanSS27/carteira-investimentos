@@ -53,4 +53,11 @@ public class TransactionsController : ControllerBase
             date = transaction.TransactionDate
         });
     }
+    
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetSummary()
+    {
+        var summary = await _portfolioService.GetPortfolioSummaryAsync();
+        return Ok(summary);
+    }
 }
