@@ -1,6 +1,6 @@
 # 📈 Carteira de Investimentos - Web API
 
-Web API desenvolvida na plataforma .NET 8 com persistência em banco de dados relacional PostgreSQL. O objetivo principal do software é a consolidação automatizada de uma carteira de investimentos em ativos de renda variável listados na bolsa de valores brasileira (B3).
+Web API desenvolvida na plataforma .NET 10 com persistência em banco de dados relacional PostgreSQL. O objetivo principal do software é a consolidação automatizada de uma carteira de investimentos em ativos de renda variável listados na bolsa de valores brasileira (B3).
 
 ## 🚀 Funções Principais do Sistema
 
@@ -16,43 +16,68 @@ Web API desenvolvida na plataforma .NET 8 com persistência em banco de dados re
 A estrutura abaixo organiza a aplicação separando as responsabilidades, isolando o núcleo de negócios das ferramentas de tecnologia.
 
 ```text
-📁 CarteiraInvestimentosApp
-│
-├── 📁 Domain/                      <-- O Coração: Regras puras de negócio (Sem pacotes externos)
-│   ├── 📁 Entities/
-│   │   └── 📄 Transacao.cs          <-- Entidade C# pura que representa a tabela
-│   └── 📁 Services/
-│       └── 📄 CarteiraService.cs   <-- Onde vivem as fórmulas matemáticas de cálculo
-│
-├── 📁 Ports/                       <-- As Fronteiras: Apenas Interfaces (Contratos de código)
-│   ├── 📄 ICarteiraService.cs      <-- Interface que expõe as regras de negócio
-│   └── 📄 IMercadoFinanceiroService.cs <-- Interface que isola a busca de cotações
-│
-├── 📁 Adapters/                    <-- Os Músculos: Onde a tecnologia real é implementada
-│   │
-│   ├── 📁 Driving/                 <-- Entrada: Quem aciona a sua aplicação de fora
-│   │   └── 📁 Controllers/
-│   │       ├── 📄 TransacoesController.cs <-- Recebe o POST para salvar ordens
-│   │       └── 📄 CarteiraController.cs   <-- Recebe o GET para listar o resumo
-│   │
-│   └── 📁 Infrastructure/          <-- Saída: Ferramentas externas que a aplicação usa
-│       ├── 📁 Database/            <-- Persistência de Dados (Entity Framework + PostgreSQL)
-│       │   └── 📄 ApplicationDbContext.cs
-│       └── 📁 External/            <-- Integrações de Rede (Flurl + API Brapi)
-│           └── 📄 MercadoFinanceiroService.cs
-│
-├── 📁 Dtos/                        <-- Data Transfer Objects: Moldes para entrada/saída de JSON
-│   ├── 📄 ResumoCarteiraDto.cs     <-- Estrutura de retorno do GET da carteira
-│   └── 📄 AtivoResumoDto.cs        <-- Detalhe de cada ativo dentro do resumo
-│
-├── 📄 Program.cs                   <-- O Cérebro: Inicializa tudo e injeta as dependências
-└── 📄 appsettings.json             <-- Configurações: String de conexão do banco de dados
+📁 CarteiraInvestimentosAPI/
+├── 📁 Adapters/                 # Camada de adaptação ao mundo externo
+│   ├── 📁 Driving/              # Adaptadores de entrada
+│   │   ├── 📁 Controllers/      # Endpoints REST (HTTP) da API
+│   │   └── 📁 Validators/       # Validações de entrada de dados (FluentValidation)
+│   └── 📁 Infrastructure/       # Adaptadores de saída (Ferramentas e Serviços)
+│       ├── 📁 Database/         # Persistência de dados e contexto do EF Core (PostgreSQL)
+│       └── 📁 ExternalServices/ # Clientes HTTP para APIs externas (Integração Brapi)
+├── 📁 Domain/                   # Implementação das regras de negócio (Independente de Frameworks)
+│   ├── 📁 Entities/             # Modelos de negócio centrais e Enums
+│   └── 📁 Services/             # Serviços core que executam as regras financeiras
+├── 📁 DTOs/                     # Data Transfer Objects 
+├── 📁 Migrations/               # Histórico de versionamento do Banco de Dados
+├── 📁 Ports/                    # Interfaces de contrato (Garantem a inversão de dependência)
+├── 📄 appsettings.json          # Arquivo de configuração (Template sem credenciais reais)
+└── 📄 Program.cs                # Inicializador do .NET, Pipeline HTTP e Container de DI
 ```
 ---
 
 ## 🛠️ Tecnologias Chave
 
-* **.NET 8 / 10**
+* **.NET 10**
 * **Entity Framework Core** (Adaptador ORM para PostgreSQL)
-* **Flurl** (Consumo fluente da API Brapi)
-* **PostgreSQL** (Banco de dados relacional)
+* **FluentValidation** (Validação fortemente tipada e desacoplada para dados de entrada)
+* **Flurl** (Consumo fluente e assíncrono da API Brapi)
+* **PostgreSQL 16.14** (Banco de dados relacional)
+
+---
+
+## ⚙️ Configuração do Ambiente Local
+
+### 1. Clonar e Restaurar Dependências
+```bash
+git clone [https://github.com/RyanSS27/carteira-investimentos.git](https://github.com/RyanSS27/carteira-investimentos.git)
+cd carteira-investimentos-api
+dotnet restore
+```
+### 2. Configurar Credenciais Seguras (User Secrets)
+Para não expor senhas no repositório do Git, utilize a ferramenta de segredos do .NET para injetar sua string de conexão local do PostgreSQL de forma segura:
+```bash
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=carteira_investimentos_db;Username=postgres;Password=SUA_SENHA_AQUI"
+```
+### 3. Executar as Migrations (Criação do Banco)
+Com o serviço do PostgreSQL ativo em sua máquina, aplique a estrutura das tabelas usando o EF Core:
+
+```Bash
+dotnet ef database update
+```
+### 4. Rodar a Aplicação
+```Bash
+dotnet run
+```
+
+
+## 🧪 Como Testar as Requisições
+Via Postman:
+* A coleção com os exemplos de chamadas prontas está disponível na raiz do repositório.
+
+* Abra o Postman.
+
+* Clique em Import.
+
+* Selecione o arquivo postman/collection.json localizado na pasta do projeto.
+
+* Execute as requisições para os endpoints configurados
