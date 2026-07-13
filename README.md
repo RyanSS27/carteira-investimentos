@@ -56,7 +56,7 @@ dotnet restore
 ### 2. Configurar Credenciais Seguras (User Secrets)
 Para não expor senhas no repositório do Git, utilize a ferramenta de segredos do .NET para injetar sua string de conexão local do PostgreSQL de forma segura:
 ```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=carteira_investimentos_db;Username=postgres;Password=SUA_SENHA_AQUI"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=VALOR_PORTA_LOCAL;Database=carteira_investimentos_db;Username=postgres;Password=SUA_SENHA_AQUI"
 ```
 ### 3. Executar as Migrations (Criação do Banco)
 Com o serviço do PostgreSQL ativo em sua máquina, aplique a estrutura das tabelas usando o EF Core:
@@ -68,16 +68,81 @@ dotnet ef database update
 ```Bash
 dotnet run
 ```
-
+---
 
 ## 🧪 Como Testar as Requisições
-Via Postman:
-* A coleção com os exemplos de chamadas prontas está disponível na raiz do repositório.
 
-* Abra o Postman.
+### 📌 Endpoints Principais
 
-* Clique em Import.
+#### 1. Registrar Transação
+* **Rota:** `POST http://localhost:[PORTA-LOCAL]/api/transactions/`
+* **Valores válidos para `transactionType`:** `BUY` (ou `0`), `SELL` (ou `1`).
+* **Exemplo de Payload (Body):**
+```json
+{
+  "ticker": "ITUB4",
+  "quantity": 100,
+  "unitPrice": 27.50,
+  "transactionType": "BUY"
+}
 
-* Selecione o arquivo postman/collection.json localizado na pasta do projeto.
+```
 
-* Execute as requisições para os endpoints configurados
+* **Retorno de Sucesso (201):**
+
+```json
+{
+    "message": "Transação de SELL de Ticker ITUB4 salva com sucesso!",
+    "transactionId": "49fcfc08-1773-4169-85a3-d5878883a3fa",
+    "date": "2026-07-13T17:00:19.5017595Z"
+}
+
+```
+
+#### 2. Consulta de Posição da Carteira
+
+* **Rota:** `GET http://localhost:[PORTA-LOCAL]/api/transactions/summary`
+* **Retorno de Sucesso (200):**
+
+```json
+{
+    "ownerName": "Ryan Silva",
+    "totalValue": 942.72,
+    "totalValueUpToDate": 162.72,
+    "totalValueEstimated": 780.00,
+    "calculationDate": "2026-07-13T17:00:30.113622Z",
+    "assets": [
+        {
+            "ticker": "PETR4",
+            "currentQuantity": 4,
+            "averagePrice": 30.00,
+            "currentMarketPrice": 40.68,
+            "totalInvestedValue": 120.00,
+            "totalCurrentValue": 162.72,
+            "returnPercentage": 35.60,
+            "profitOrLoss": 42.72,
+            "isPriceUpToDate": true
+        },
+        {
+            "ticker": "TESTE4",
+            "currentQuantity": 26,
+            "averagePrice": 30.00,
+            "currentMarketPrice": 30.00,
+            "totalInvestedValue": 780.00,
+            "totalCurrentValue": 780.00,
+            "returnPercentage": 0,
+            "profitOrLoss": 0.00,
+            "isPriceUpToDate": false
+        }
+    ]
+}
+
+```
+
+### 🚀 Execução via Postman
+
+1. Abra o Postman e clique em **Import**.
+2. Selecione o arquivo `postman-tests/CarteiraInvestimentosAPI.postman_collection.json` localizado na pasta do projeto.
+3. ⚠️ **ATENÇÃO:** As requisições vêm configuradas por padrão para o endereço de desenvolvimento local `http://localhost:5195/`. Caso a sua aplicação esteja rodando em outra porta (verifique o terminal ao iniciar o projeto), lembre-se de alterar o domínio/porta nas rotas da coleção do Postman antes de enviar.
+4. Execute as chamadas desejadas.
+
