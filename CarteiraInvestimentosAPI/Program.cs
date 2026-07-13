@@ -21,6 +21,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Injeção de dependências
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

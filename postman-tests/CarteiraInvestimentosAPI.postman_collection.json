@@ -1,0 +1,104 @@
+{
+  "info": {
+    "_postman_id": "8de5d741-17e2-4d17-b973-95432c9e0444",
+    "name": "CarteiraInvestimentosAPI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53243745",
+    "_collection_link": "https://go.postman.co/collection/53243745-8de5d741-17e2-4d17-b973-95432c9e0444?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Transações",
+      "item": [
+        {
+          "name": "01 - Compra PETR4",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "02 - Venda parcial PETR4",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "03 - Compra WEGE3",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Venda parcial WEGE3",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "05 - Compra TESTE4 (ação que não consta em consultas externas)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Essa ação é fictícia e não consta em nenhum meio de consulta, usada apenas para demonstrar como a aplicação lida ao não receber informações sobre determinado ativo"
+          },
+          "response": []
+        },
+        {
+          "name": "06 - Venda parcial TESTE4",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Observando Erros",
+      "item": [
+        {
+          "name": "Venda indevida de ações",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Erro de ação inexistente / venda indevida de uma quantidade superior ao que se possuí em estoque"
+          },
+          "response": []
+        },
+        {
+          "name": "Compra com envio incorreto de valores",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Valor inválido para TransactionType",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ],
+      "description": "Requisições que retornam erros propositais"
+    },
+    {
+      "name": "Consultar carteira",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ]
+}
