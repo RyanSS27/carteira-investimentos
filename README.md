@@ -72,7 +72,7 @@ dotnet run
 
 ## 🧪 Como Testar as Requisições
 
-### 📌 Endpoints Principais
+### Endpoints Principais
 
 #### 1. Registrar Transação
 * **Rota:** `POST http://localhost:[PORTA-LOCAL]/api/transactions/`
@@ -139,7 +139,7 @@ dotnet run
 
 ```
 
-### 🚀 Execução via Postman
+### Execução via Postman
 
 1. Abra o Postman e clique em **Import**.
 2. Selecione o arquivo `postman-tests/CarteiraInvestimentosAPI.postman_collection.json` localizado na pasta do projeto.
