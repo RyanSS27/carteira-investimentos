@@ -2,7 +2,7 @@
 
 Web API desenvolvida na plataforma .NET 10 com persistência em banco de dados relacional PostgreSQL. O objetivo principal do software é a consolidação automatizada de uma carteira de investimentos em ativos de renda variável listados na bolsa de valores brasileira (B3).
 
-## 🚀 Funções Principais do Sistema
+## 🚀 Funcionalidades
 
 * **Registrar Movimentações:** Permitir a entrada e persistência de operações históricas de Compra e Venda de ações.
 * **Consolidar Posição:** Calcular em tempo de execução a quantidade atual líquida e o preço médio ponderado de custo de cada ativo.
@@ -35,7 +35,7 @@ A estrutura abaixo organiza a aplicação separando as responsabilidades, isolan
 ```
 ---
 
-## 🛠️ Tecnologias Chave
+## 🛠️ Tecnologias 
 
 * **.NET 10**
 * **Entity Framework Core** (Adaptador ORM para PostgreSQL)
@@ -70,7 +70,7 @@ dotnet run
 ```
 ---
 
-## 🧪 Como Testar as Requisições
+## 🧪 Como Utilizar
 
 ### Endpoints Principais
 
